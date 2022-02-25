@@ -28,11 +28,11 @@ void server_main() {
     struct sockaddr_un addr = create_address(SERVER_PATH);
     result = bind(fd, (struct sockaddr*)&addr, sizeof(struct sockaddr_un));
     if (result == -1)
-        error("Could not bind socket");
+        report_error("Could not bind socket");
 
     result = listen(fd, 1);
     if (result == -1)
-        error("Could not listen for sockets");
+        report_error("Could not listen for sockets");
 
     //
     // WAITING FOR CONNECTIONS
@@ -67,7 +67,7 @@ void server_main() {
                 }
             }
             else if (errno != EAGAIN && errno != EWOULDBLOCK)
-                error("Error while accepting a socket");
+                report_error("Error while accepting a socket");
         }
 
         // TRY RECEIVING DATA
@@ -105,5 +105,5 @@ void server_main() {
     // CLEANING UP
     result = shutdown(fd, SHUT_RDWR);
     if (result == -1)
-        error("Could not shutdown socket");
+        report_error("Could not shutdown socket");
 }

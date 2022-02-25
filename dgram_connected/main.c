@@ -23,7 +23,7 @@ int main() {
 
     result = bind(socket_two, (struct sockaddr*)&address, sizeof(struct sockaddr_un));
     if (result == -1)
-        error("Could not bind two");
+        report_error("Could not bind two");
 
     printf("Sending...\n");
     sendto(socket_one, "Hello", 6, 0, (struct sockaddr*)&address, sizeof(struct sockaddr_un));

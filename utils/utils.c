@@ -49,7 +49,7 @@ void print_errno() {
             printf("0x%02x\n", errno);
     }
 }
-void error(char *message) {
+void report_error(char *message) {
     printf("%s: ", message);
     print_errno();
     exit(1);

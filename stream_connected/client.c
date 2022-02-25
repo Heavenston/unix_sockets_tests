@@ -18,7 +18,7 @@ void client_main() {
     struct sockaddr_un addr = create_address(SERVER_PATH);
     result = connect(fd, (struct sockaddr*)&addr, sizeof(struct sockaddr_un));
     if (result == -1)
-        error("Could not connect to server");
+        report_error("Could not connect to server");
     printf("Connected to server!\n");
     printf("Type message to end\n");
     printf("Type 'exit' to quit the program\n");
@@ -42,5 +42,5 @@ void client_main() {
 
     result = shutdown(fd, SHUT_RDWR);
     if (result == -1)
-        error("Could not shutdown socket");
+        report_error("Could not shutdown socket");
 }
