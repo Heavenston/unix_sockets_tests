@@ -19,12 +19,11 @@ void receiver(int socket) {
     printf("Read message: %s\n", recvBuffer);
 
     free(recvBuffer);
-    /*
     for (int i = 0; i < 10; i++) {
         send(socket, &i, sizeof(int), 0);
-        sleep(1);
+        // 250ms sleep
+        usleep(250000);
     }
-    */
 
     int i = -1;
     send(socket, &i, sizeof(int), 0);
