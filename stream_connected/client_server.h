@@ -1,3 +1,5 @@
+#pragma once
+
 #define SERVER_PATH "/tmp/seqpkt_server.socket"
 #define MAXIMUM_PACKET_SIZE 1000000
 

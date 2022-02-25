@@ -1,3 +1,5 @@
+#pragma once
+
 #include <sys/un.h>
 
 void print_errno();
