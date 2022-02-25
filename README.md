@@ -35,3 +35,7 @@ cmake ..     # Generake build files
 make         # Build binaries
 ```
 After that the different binaries should be located in the build folder.
+
+# Contributions
+Do not hesitate to make pull requests! To fix typos,
+my absense of talent with C or to add functionalities: go ahead.
