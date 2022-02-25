@@ -12,7 +12,7 @@
 #include "client_server.h"
 
 void client_main() {
-    int result = 150;
+    int result;
     int fd = socket(AF_UNIX, SOCK_STREAM, 0);
 
     struct sockaddr_un addr = create_address(SERVER_PATH);
@@ -20,7 +20,7 @@ void client_main() {
     if (result == -1)
         report_error("Could not connect to server");
     printf("Connected to server!\n");
-    printf("Type message to end\n");
+    printf("Type messages to be sent to the server\n");
     printf("Type 'exit' to quit the program\n");
     
     send_packet(fd, "HELLLLOOOO", 11);
