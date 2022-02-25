@@ -1,3 +1,4 @@
+#include <sys/un.h>
 
 void print_errno();
 void error(char *message);
