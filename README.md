@@ -32,7 +32,7 @@ This project uses cmake to generate the build files:
 mkdir build  # Make a build directory
 cd build
 cmake ..     # Generake build files
-make         # Build binaries
+make         # Build the project
 ```
 After that the different binaries should be located in the build folder.
 
