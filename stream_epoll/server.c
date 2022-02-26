@@ -22,7 +22,6 @@ typedef struct {
 void server_main() {
     int result;
     int fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    //fcntl(fd, F_SETFL, O_NONBLOCK);
 
     unlink(SERVER_PATH);
 
