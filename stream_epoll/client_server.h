@@ -6,6 +6,11 @@
 typedef struct {
     int id;
 } handshake_packet_t;
+typedef struct {
+    int sender_id;
+    char username[20];
+    char message[];
+} server_message_t;
 
 void client_main();
 void server_main();

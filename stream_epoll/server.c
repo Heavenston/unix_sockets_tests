@@ -17,7 +17,7 @@
 typedef struct {
     int fd;
     int id;
-    char *username;
+    char username[20];
 } Socket;
 
 void server_main() {
@@ -35,19 +35,34 @@ void server_main() {
     if (result == -1)
         report_error("Could not listen for sockets");
 
+    {
+        int value = 1;
+        socklen_t length = sizeof(int);
+        result = setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &value, length);
+        if (result == -1)
+            report_error("Could not read option");
+    }
+
+    // Values
+    int socket_id_counter = 1;
+    Socket *sockets[100];
+    memset(sockets, 0, sizeof(sockets));
+
     // EPOLL SETUP
     int epoll_fd = epoll_create1(0);
     if (epoll_fd == -1)
         report_error("Could not create the epoll fd");
 
+    Socket *server_socket = malloc(sizeof(Socket));
+    server_socket->fd = fd;
+    server_socket->id = 0;
+    strcpy(server_socket->username, "server");
+    sockets[0] = server_socket;
+
     {
         struct epoll_event event;
         event.events = EPOLLIN;
-        Socket *socket = malloc(sizeof(Socket));
-        socket->fd = fd;
-        socket->id = 0;
-        socket->username = "server";
-        event.data.ptr = socket;
+        event.data.u32 = 0;
         result = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event);
         if (result == -1)
             report_error("Could not add server socket file descriptor to epoll");
@@ -56,13 +71,13 @@ void server_main() {
     printf("Waiting for conncetions...\n");
 
     // EPOLL LOOP
-    int socket_id_counter = 1;
+
     while (1) {
         struct epoll_event event;
         result = epoll_wait(epoll_fd, &event, 1, -1);
         if (result == -1)
             report_error("Error during epoll_wait");
-        Socket *socket = (Socket*)event.data.ptr;
+        Socket *socket = sockets[event.data.u32];
 
         if (socket->id == 0) {
             struct sockaddr_un connected_addr;
@@ -73,25 +88,27 @@ void server_main() {
             
             printf("Socket connection received, assigning id %d\n", socket_id_counter);
 
-            struct epoll_event new_event;
+            int index = 1;
+            while (index < 100 && sockets[index] != NULL)
+                index++;
 
             Socket *new_socket = malloc(sizeof(Socket));
             new_socket->fd = accepted_fd;
             new_socket->id = socket_id_counter++;
-            new_socket->username = malloc(10);
             sprintf(new_socket->username, "%i", new_socket->id);
-            new_event.data.ptr = new_socket;
+            sockets[index] = new_socket;
+
+            struct epoll_event new_event;
+            new_event.data.u32 = index;
             new_event.events = EPOLLIN;
-
-            handshake_packet_t handshake_packet;
-            handshake_packet.id = new_socket->id;
-            result = send_packet(accepted_fd, &handshake_packet, sizeof(handshake_packet_t));
-            if (result == -1)
-                report_error("Could not send handshake packet");
-
             result = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, accepted_fd, &new_event);
             if (result == -1)
                 report_error("Could not add new socket to epoll");
+
+            handshake_packet_t handshake_packet = { new_socket->id };
+            result = send_packet(accepted_fd, &handshake_packet, sizeof(handshake_packet_t));
+            if (result == -1)
+                report_error("Could not send handshake packet");
         }
         else {
             char *received_data;
@@ -99,6 +116,22 @@ void server_main() {
             if (received_bytes > 0) {
                 // PROBLEM: If received data isn't a null-terminated string
                 printf("[%s] %s\n", socket->username, received_data);
+
+                server_message_t *message = malloc(sizeof(server_message_t) + received_bytes);
+                message->sender_id = socket->id;
+                strcpy(message->username, socket->username);
+                strcpy(message->message, received_data);
+                for (int i = 1; i < 100; i++) {
+                    if (sockets[i] == NULL || i == event.data.u32)
+                        continue;
+                    Socket *socket_b = sockets[i];
+
+                    result = send_packet(socket_b->fd, message, sizeof(server_message_t) + received_bytes);
+                    if (result == -1)
+                        report_error("Could not send packet");
+                }
+
+                free(message);
                 free(received_data);
             }
             else {
@@ -109,10 +142,13 @@ void server_main() {
                     printf("Error while reading data from #%i: ", socket->id);
                     print_errno();
                 }
+
                 result = epoll_ctl(epoll_fd, EPOLL_CTL_DEL, socket->fd, NULL);
                 if (result == -1)
                     report_error("Could not delete socket from epoll");
+
                 free(socket);
+                sockets[event.data.u32] = NULL;
             }
         }
     }
