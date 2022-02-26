@@ -44,6 +44,8 @@ void print_errno() {
         CASEOF(EADDRINUSE)
 
         CASEOF(EAGAIN)
+        CASEOF(EMFILE)
+        CASEOF(ENOMEM)
 
         default:
             printf("0x%02x\n", errno);
