@@ -19,11 +19,15 @@ void client_main() {
     result = connect(fd, (struct sockaddr*)&addr, sizeof(struct sockaddr_un));
     if (result == -1)
         report_error("Could not connect to server");
-    printf("Connected to server!\n");
+
+    handshake_packet_t *handshake;
+    result = recv_packet(fd, (void**)&handshake);
+    if (result == -1)
+        report_error("Could not received handshake");
+
+    printf("Connected to server with id #%i!\n", handshake->id);
     printf("Type messages to be sent to the server\n");
     printf("Type 'exit' to quit the program\n");
-    
-    send_packet(fd, "HELLLLOOOO", 11);
 
     char buffer[150];
     while (1) {

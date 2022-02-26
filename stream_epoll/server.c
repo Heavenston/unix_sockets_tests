@@ -17,6 +17,7 @@
 typedef struct {
     int fd;
     int id;
+    char *username;
 } Socket;
 
 void server_main() {
@@ -45,6 +46,7 @@ void server_main() {
         Socket *socket = malloc(sizeof(Socket));
         socket->fd = fd;
         socket->id = 0;
+        socket->username = "server";
         event.data.ptr = socket;
         result = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event);
         if (result == -1)
@@ -76,8 +78,16 @@ void server_main() {
             Socket *new_socket = malloc(sizeof(Socket));
             new_socket->fd = accepted_fd;
             new_socket->id = socket_id_counter++;
+            new_socket->username = malloc(10);
+            sprintf(new_socket->username, "%i", new_socket->id);
             new_event.data.ptr = new_socket;
             new_event.events = EPOLLIN;
+
+            handshake_packet_t handshake_packet;
+            handshake_packet.id = new_socket->id;
+            result = send_packet(accepted_fd, &handshake_packet, sizeof(handshake_packet_t));
+            if (result == -1)
+                report_error("Could not send handshake packet");
 
             result = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, accepted_fd, &new_event);
             if (result == -1)
@@ -88,7 +98,7 @@ void server_main() {
             int received_bytes = recv_packet(socket->fd, (void**)&received_data);
             if (received_bytes > 0) {
                 // PROBLEM: If received data isn't a null-terminated string
-                printf("[%i] %s\n", socket->id, received_data);
+                printf("[%s] %s\n", socket->username, received_data);
                 free(received_data);
             }
             else {
