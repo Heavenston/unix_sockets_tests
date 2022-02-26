@@ -26,6 +26,9 @@ You should only run one process with 'server' but can run any number of 'client'
 The clients will connect to the server, than ask the user to type. Each message will be
 sent to the server, which has given unique ids to each clients to print the received messages.
 
+### StreamEpoll
+Same as StreamConnected but instead of a non-blocking io loop it uses epoll for the server
+
 # How to compile
 This project uses cmake to generate the build files:
 ```sh
