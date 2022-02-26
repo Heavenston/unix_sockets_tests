@@ -3,59 +3,12 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <string.h>
 
 #include "utils.h"
 
 void print_errno() {
-    #define CASEOF(a) case a:\
-        printf(#a);\
-        printf("\n");\
-        break;
-
-    switch (errno) {
-        CASEOF(EBADF)
-        CASEOF(EFAULT)
-        CASEOF(EINVAL)
-        CASEOF(ENOPROTOOPT)
-        CASEOF(EACCES)
-        CASEOF(ENOBUFS)
-        CASEOF(ENOSR)
-
-        CASEOF(EADDRNOTAVAIL)
-        CASEOF(EAFNOSUPPORT)
-        CASEOF(EALREADY)
-        CASEOF(ECONNREFUSED)
-        CASEOF(EINPROGRESS)
-        CASEOF(EINTR)
-        CASEOF(EISCONN)
-        CASEOF(ENETUNREACH)
-        CASEOF(ENOTSOCK)
-        CASEOF(EPROTOTYPE)
-        CASEOF(ETIMEDOUT)
-
-        CASEOF(EIO)
-        CASEOF(ELOOP)
-        CASEOF(ENAMETOOLONG)
-        CASEOF(ENOENT)
-        CASEOF(ENOTDIR)
-
-        CASEOF(EOPNOTSUPP)
-        CASEOF(EDESTADDRREQ)
-        CASEOF(EADDRINUSE)
-
-        CASEOF(EAGAIN)
-        CASEOF(EMFILE)
-        CASEOF(ENOMEM)
-
-        CASEOF(ECONNRESET)
-        CASEOF(EMSGSIZE)
-        CASEOF(ENOTCONN)
-        CASEOF(EPIPE)
-        CASEOF(ENETDOWN)
-
-        default:
-            printf("0x%02x\n", errno);
-    }
+    printf("'%s'\n", strerror(errno));
 }
 void report_error(char *message) {
     printf("%s: ", message);
