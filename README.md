@@ -27,7 +27,8 @@ The clients will connect to the server, than ask the user to type. Each message 
 sent to the server, which has given unique ids to each clients to print the received messages.
 
 ### StreamEpoll
-Same as StreamConnected but instead of a non-blocking io loop it uses epoll for the server
+Same as StreamConnected but instead of a non-blocking io loop it uses epoll for the server.
+Also uses epoll client-side to receive messages and print them
 
 # How to compile
 This project uses cmake to generate the build files:
