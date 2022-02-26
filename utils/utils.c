@@ -47,6 +47,12 @@ void print_errno() {
         CASEOF(EMFILE)
         CASEOF(ENOMEM)
 
+        CASEOF(ECONNRESET)
+        CASEOF(EMSGSIZE)
+        CASEOF(ENOTCONN)
+        CASEOF(EPIPE)
+        CASEOF(ENETDOWN)
+
         default:
             printf("0x%02x\n", errno);
     }
